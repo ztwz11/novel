@@ -1,0 +1,69 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (API keys)
+.env*
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# =========================
+# AI / Database / Data
+# =========================
+
+# SQLite database (contains user data)
+/data/
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# =========================
+# AI 개발 도구 (개발 시 사용한 AI 어시스턴트 설정)
+# =========================
+.gemini/
+.agent/
+.agents/
+_agent/
+_agents/
+.cursor/
+.copilot/
+.github/copilot/
+.windsurf/
+.cline/
+.aider*
+.continue/
+.codex/
