@@ -1,220 +1,113 @@
-<p align="center">
-  <img src="docs/logo.svg" alt="NovelForge AI" width="80" />
-</p>
+# NovelForge AI
 
-<h1 align="center">NovelForge AI ✨</h1>
+**소설 초안 작성부터 챕터 편집·내보내기까지 연결한 개인용 로컬 웹 앱입니다.**
 
-<p align="center">
-  <strong>AI 기반 장편소설 창작 도구</strong><br/>
-  페르소나 · 멀티 프로바이더 · SSE 스트리밍 · EPUB 내보내기
-</p>
+프로젝트, 작가 페르소나, 세계관·캐릭터 설정을 관리하고, 이전 챕터와 요약을 다음 생성 요청의 문맥으로 구성합니다. Next.js·React·TypeScript로 화면과 API를 만들고 SQLite에 집필 데이터를 저장합니다.
 
-<p align="center">
-  <img src="https://img.shields.io/badge/Next.js-16-black?logo=next.js" />
-  <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react" />
-  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript" />
-  <img src="https://img.shields.io/badge/SQLite-via_better--sqlite3-003B57?logo=sqlite" />
-  <img src="https://img.shields.io/badge/License-MIT-green" />
-</p>
+현재는 개인 개발 프로젝트입니다. 아래 내용은 코드에 구현된 범위이며, 상용 서비스 운영이나 장편 전체의 품질을 보장한다는 뜻은 아닙니다.
 
----
+## 주요 기능
 
-## 📖 소개
+| 기능 | 구현 범위 |
+|---|---|
+| 집필 작업 관리 | 프로젝트·권·챕터, 페르소나, 장르 프리셋, 세계관·캐릭터 설정 관리 |
+| AI 챕터 생성 | Gemini·OpenAI·Anthropic 공급자 어댑터와 설정된 모델 선택 |
+| 문맥 구성 | 설정집, 권별 시놉시스, 챕터 요약, 직전 챕터 본문, 선택한 참고 자료 조합 |
+| 생성 상태 표시 | SSE로 시작·내용·완료·오류 전달. Gemini는 생성 중 전달, 다른 공급자는 생성 완료 후 분할 전달 |
+| 집필 보조 | 탈고, 요약 압축, 일관성 점검, 삽화용 프롬프트·이미지 생성 경로 |
+| 내보내기 | TXT·HTML·EPUB 출력 코드. 전자책 리더별 호환성은 별도 확인 필요 |
 
-**NovelForge AI**는 30권 이상의 장편 웹소설을 AI와 함께 작성하기 위한 올인원 창작 도구입니다.
+삽화 API와 모델별 동작은 계정 권한·모델 가용성·요청 매개변수에 따라 달라집니다. 모든 제공자·모델의 실서비스 동작을 검증한 것으로 소개하지 않습니다.
 
-- 🎭 **페르소나 시스템** — Gemini Gems처럼 작가의 문체·톤·규칙을 정의
-- 🧠 **3단계 메모리** — 단기(최근 챕터) · 중기(압축 요약) · 장기(스토리바이블)로 일관성 유지
-- 💎 **멀티 프로바이더** — Gemini, OpenAI, Anthropic 동시 지원 + 실시간 비용 추정 (₩KRW)
-- ⚡ **SSE 스트리밍** — Gemini 실시간 토큰 스트리밍으로 타이핑 효과
-- ✏️ **AI 탈고** — 문장 다듬기, 묘사 강화, 전투 액션 등 8가지 포커스
-- 🎨 **삽화 생성** — Gemini Imagen / DALL-E 3 / 프롬프트 생성
-- 📕 **EPUB 3.0 내보내기** — 전자책 리더 호환
+## 빠른 시작
 
----
+### 1. 설치
 
-## 🚀 빠른 시작
-
-### 요구 사항
-
-- **Node.js** 20+ 
-- **API 키** 하나 이상 (Gemini / OpenAI / Anthropic)
-
-### 설치
+Node.js 22와 npm을 권장합니다. `better-sqlite3` 네이티브 모듈 설치가 필요하며, 환경에 따라 별도 빌드 도구가 필요할 수 있습니다.
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/novelforge-ai.git
-cd novelforge-ai
-npm install
+git clone https://github.com/ztwz11/novel.git
+cd novel
+npm ci
 ```
 
-### 환경 변수
+### 2. 환경변수
 
-`.env.local` 파일을 프로젝트 루트에 생성:
+저장소의 `.env.example`을 `.env.local`로 복사하고 사용하는 키만 입력합니다. 기존 `.env.local`이 있으면 덮어쓰지 마세요.
 
-```env
-# 필수 (하나 이상)
-GEMINI_API_KEY=your_gemini_api_key
-OPENAI_API_KEY=your_openai_api_key        # 선택
-ANTHROPIC_API_KEY=your_anthropic_api_key  # 선택
-```
-
-> **API 키 발급:**
-> - Gemini → [Google AI Studio](https://aistudio.google.com/apikey)
-> - OpenAI → [OpenAI Platform](https://platform.openai.com/api-keys)
-> - Anthropic → [Anthropic Console](https://console.anthropic.com/)
-
-### 실행
+macOS / Linux:
 
 ```bash
-npm run dev
+cp -n .env.example .env.local
 ```
 
-`http://localhost:3000` 에서 접속할 수 있습니다.
+Windows PowerShell:
 
----
-
-## 🏗️ 프로젝트 구조
-
-```
-novelforge-ai/
-├── src/
-│   ├── app/                    # Next.js App Router
-│   │   ├── page.tsx            # 메인 대시보드
-│   │   ├── personas/           # 페르소나 관리
-│   │   ├── project/[id]/       # 프로젝트 에디터
-│   │   └── api/                # API 라우트
-│   │       └── projects/[id]/
-│   │           ├── generate/   # 챕터 생성
-│   │           ├── stream/     # SSE 스트리밍
-│   │           ├── revise/     # AI 탈고
-│   │           ├── illustrate/ # 삽화 생성
-│   │           ├── export/     # TXT/HTML/EPUB
-│   │           ├── estimate/   # 비용 추정
-│   │           ├── compress/   # 요약 압축
-│   │           └── consistency/# 일관성 검증
-│   ├── components/             # UI 컴포넌트
-│   │   ├── ChapterSidebar.tsx
-│   │   ├── ChapterViewer.tsx
-│   │   ├── GenerateTab.tsx     # 스트리밍 포함
-│   │   ├── ReviseTab.tsx
-│   │   ├── IllustrateTab.tsx
-│   │   └── StoryBibleTab.tsx
-│   └── lib/
-│       ├── ai/
-│       │   ├── providers/      # Gemini, OpenAI, Anthropic
-│       │   ├── prompt-builder.ts
-│       │   └── gemini-client.ts
-│       ├── memory/
-│       │   ├── memory-manager.ts
-│       │   └── summary-compressor.ts
-│       ├── export/exporter.ts  # TXT, HTML, EPUB 3.0
-│       └── db.ts               # SQLite (better-sqlite3)
-├── docs/                       # 가이드 문서
-└── data/                       # SQLite DB (gitignored)
+```powershell
+if (-not (Test-Path .env.local)) { Copy-Item .env.example .env.local }
 ```
 
----
+| 변수 | 사용 범위 |
+|---|---|
+| `GEMINI_API_KEY` | Gemini 챕터 생성·스트리밍, Gemini 기반 요약·삽화 프롬프트 등 보조 기능 |
+| `OPENAI_API_KEY` | OpenAI 챕터 생성과 이미지 생성 경로 |
+| `ANTHROPIC_API_KEY` | Anthropic 챕터 생성 경로 |
 
-## ✨ 주요 기능
+기본 집필 흐름을 살펴볼 때는 Gemini 키부터 설정하세요. 챕터 공급자를 바꾸더라도 일부 보조 기능은 Gemini를 사용합니다. 예를 들어 OpenAI 이미지 생성도 앞선 삽화 프롬프트 작성에는 Gemini가 필요합니다. `NEXT_PUBLIC_` 환경변수에 API 키를 넣지 마세요.
 
-### 🎭 페르소나
+### 3. 로컬 실행
 
-장르별 프리셋(무협, 판타지, 현대판타지...)으로 빠르게 생성하거나, 직접 시스템 프롬프트와 작성 규칙을 정의합니다. 지식 파일을 첨부하면 세계관·설정집을 AI가 참고합니다.
-
-### ✨ 챕터 생성
-
-| 기능 | 설명 |
-|------|------|
-| 방향 지시 | "주인공이 비급을 발견하고 수련 시작" 같은 자연어 지시 |
-| 프로바이더 선택 | 💎 Gemini · 🤖 OpenAI · 🟣 Anthropic |
-| 모델 선택 | 각 프로바이더의 모든 모델 지원 |
-| 비용 추정 | 생성 전 ₩KRW 단위 비용 자동 계산 |
-| SSE 스트리밍 | 실시간 타이핑 효과 (토글 가능) |
-| 지식 파일 | 선택적으로 참고 자료 포함 |
-
-### ✏️ AI 탈고
-
-- **8가지 포커스**: 문장 다듬기, 묘사 강화, 대사 개선, 전투 액션, 페이싱, 감정선, 일관성, 분량
-- **3단계 강도**: 🌱 가볍게 · ⚡ 보통 · 🔥 대폭 수정
-- 여러 챕터 동시 선택 후 일괄 탈고
-
-### 🎨 삽화
-
-- **프로바이더**: Gemini Imagen 3 · OpenAI DALL-E 3 · 프롬프트만 생성
-- **유형**: 장면 · 캐릭터 · 배경 · 표지
-- **스타일**: 애니메이션 · 웹툰 · 수묵화 · 디지털 아트 · 유화 등 8종
-- 한국어 + 영어 프롬프트 동시 생성
-
-### 📕 내보내기
-
-- **TXT** — 플레인 텍스트
-- **HTML** — 스타일링된 웹 페이지
-- **EPUB 3.0** — 전자책 리더 호환 (목차, 챕터별 분리, 한국어 스타일)
-
-### 🧠 메모리 시스템
-
-30권 이상 장편에서도 일관성을 유지하기 위한 3단계 메모리:
-
-```
-┌─────────────┐  ┌─────────────────┐  ┌──────────────┐
-│  단기 메모리  │  │   중기 메모리     │  │  장기 메모리   │
-│  최근 3-5화  │  │  압축 요약       │  │ 스토리바이블   │
-│  전체 텍스트  │  │  핵심 이벤트만   │  │ 캐릭터·세계관  │
-└─────────────┘  └─────────────────┘  └──────────────┘
+```bash
+npm run dev -- --hostname 127.0.0.1
 ```
 
----
+브라우저에서 `http://127.0.0.1:3000`을 엽니다. 기본 포트가 사용 중이면 터미널에 표시된 주소를 확인하세요. 로컬 빌드 실행은 다음과 같습니다.
 
-## 🛠️ 기술 스택
+```bash
+npm run build
+npm run start -- --hostname 127.0.0.1
+```
 
-| 영역 | 기술 |
-|------|------|
-| 프레임워크 | Next.js 16 (App Router, Turbopack) |
-| UI | React 19, Vanilla CSS (다크 테마) |
-| DB | SQLite via better-sqlite3 |
-| AI | Gemini, OpenAI, Anthropic SDK |
-| 스트리밍 | Server-Sent Events (SSE) |
-| EPUB | JSZip |
-| 타입 | TypeScript 5, Zod |
-| 테스트 | Jest, Testing Library |
+**로컬 저장과 오프라인 실행은 다릅니다.** AI 기능을 사용하면 요청에 포함된 원고·설정·참고 자료가 외부 AI 제공자에 전달되고 비용이 발생할 수 있습니다. 회사 자료나 공개 권한이 없는 원고는 입력하지 마세요.
 
----
+## 코드를 보는 순서
 
-## 📝 API 라우트
+화면에서 AI 요청과 저장으로 이어지는 경로를 먼저 보는 편이 이해하기 쉽습니다.
 
-| Method | Endpoint | 설명 |
-|--------|----------|------|
-| GET | `/api/projects` | 프로젝트 목록 |
-| POST | `/api/projects` | 프로젝트 생성 |
-| GET | `/api/projects/[id]` | 프로젝트 상세 |
-| POST | `/api/projects/[id]/generate` | 챕터 생성 |
-| POST | `/api/projects/[id]/stream` | SSE 스트리밍 생성 |
-| POST | `/api/projects/[id]/revise` | AI 탈고 |
-| POST | `/api/projects/[id]/illustrate` | 삽화 생성 |
-| GET | `/api/projects/[id]/export` | 내보내기 (txt/html/epub) |
-| POST | `/api/projects/[id]/estimate` | 비용 추정 |
-| POST | `/api/projects/[id]/compress` | 요약 압축 |
-| POST | `/api/projects/[id]/consistency` | 일관성 검증 |
-| GET/POST | `/api/personas` | 페르소나 CRUD |
-| GET/POST | `/api/personas/[id]/knowledge` | 지식 파일 관리 |
+| 관심 영역 | 시작 위치 |
+|---|---|
+| 화면과 편집 흐름 | [`src/app`](src/app), [`src/components`](src/components) |
+| 생성·스트리밍 API | [`src/app/api/projects`](src/app/api/projects) |
+| 공급자 교체 | [`src/lib/ai/providers`](src/lib/ai/providers) |
+| 문맥 선택 | [`memory-manager.ts`](src/lib/memory/memory-manager.ts) |
+| 데이터 저장 | [`src/lib/db`](src/lib/db) |
+| 파일 출력 | [`exporter.ts`](src/lib/export/exporter.ts) |
 
----
+세부 구조와 검증 방법은 [개발·검증 안내](docs/development.md), 참고 자료 관리는 [지식 파일 안내](docs/knowledge-file-guide.md)에 정리했습니다.
 
-## 🤝 기여
+## 테스트와 정적 검사
 
-1. Fork 후 새 브랜치에서 작업
-2. `npm run build` 로 빌드 확인
-3. Pull Request 생성
+```bash
+npm test
+npm run test:ci
+npm run typecheck
+npm run lint
+npm run build
+```
 
----
+`npm test`와 `npm run test:ci`는 같은 Jest 테스트를 각각 기본 모드와 단일 프로세스 CI 모드로 실행합니다. 둘 다 실행해야 서로 다른 범위를 검증하는 것은 아닙니다. 변경 중 반복 실행은 `npm run test:watch`를 사용합니다.
 
-## 📄 라이선스
+현재 테스트 파일은 장르 프리셋, 집필 설정의 규칙 변환, DB를 모의 처리한 문맥 구성과 TXT·HTML 출력을 다룹니다. 실제 AI 요청, 브라우저 E2E, EPUB 리더 호환성 검증과는 별개입니다. 이 문서는 테스트 통과 수나 커버리지를 주장하지 않으며, 결과는 실행 환경에서 확인해야 합니다.
 
-MIT License — 자유롭게 사용, 수정, 배포할 수 있습니다.
+## 설계상 구분한 점과 한계
 
----
+- **공급자와 공통 문맥:** 생성 인터페이스는 분리했지만 요약 등 일부 보조 기능은 Gemini에 의존합니다. 모델 목록은 코드에 정의돼 있으며 모든 모델을 자동 지원하지 않습니다.
+- **본문과 요약:** 설정집·요약·직전 챕터를 나눠 문맥을 만듭니다. 압축 과정에서 세부 내용이 빠질 수 있으며, 장편 전체의 설정 일관성은 검증된 성능 지표가 아닙니다.
+- **추정치와 실제 사용량:** 토큰·비용은 일부 고정값과 휴리스틱을 사용합니다. 최신 요금·실제 청구액·비용 상한으로 해석하지 마세요.
+- **로컬 앱과 공개 서비스:** 다중 사용자 인증·권한·요청 제한을 갖춘 공개 서비스로 검증하지 않았습니다. 터널이나 공용 서버로 그대로 공개하지 마세요.
 
-<p align="center">
-  Made with ❤️ for Korean web novel writers
-</p>
+## 데이터와 라이선스
+
+집필 데이터는 `data/novelforge.db`에 저장됩니다. `.env.local`, `data/`, DB 파일은 Git 제외 대상이며, `.env.example`에는 빈 키 이름만 둡니다. 공개 이슈·PR에는 API 키, 원고 원문, 개인 경로 또는 실제 DB를 올리지 마세요.
+
+소스 코드는 [MIT License](LICENSE)를 따릅니다. 외부 모델의 이용 조건과 입력 자료·생성물의 권리는 별도로 확인해야 합니다.
